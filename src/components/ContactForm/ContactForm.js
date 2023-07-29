@@ -1,60 +1,69 @@
-import { Component } from 'react';
+import { useState } from 'react';
 import css from './ContactForm.module.css';
 import { nanoid } from 'nanoid';
 
-class ContactForm extends Component {
-  state = {
-    name: '',
-    number: '',
-  };
-  stateChange = e => {
+const ContactForm = ({ onSubmitData }) => {
+  const [name, setName] = useState('');
+  const [number, setNumber] = useState('');
+
+  const stateChange = e => {
     const { name, value } = e.currentTarget;
-    this.setState({ [name]: value });
+    switch (name) {
+      case 'name': {
+        setName(value);
+        break;
+      }
+      case 'number': {
+        setNumber(value);
+        break;
+      }
+      default:
+        break;
+    }
   };
 
-  getSubmitData = e => {
+  const getSubmitData = e => {
     e.preventDefault();
-    if (!this.state.name.trim() || !this.state.number.trim()) {
+    if (!name.trim() || !number.trim()) {
       window.alert('Please complete all fields');
       return;
     }
-    this.props.onSubmitData({ ...{ id: nanoid() }, ...this.state });
-    this.setState({ name: '', number: '' });
+    onSubmitData({ ...{ id: nanoid() }, ...{ name, number } });
+    setName('');
+    setNumber('');
   };
 
-  render() {
-    return (
-      <form className={css.form} onSubmit={this.getSubmitData}>
-        <label className={css.label}>
-          <span className={css.labelText}>Name</span>
-          <input
-            className={css.input}
-            name="name"
-            type="text"
-            value={this.state.name}
-            onChange={this.stateChange}
-            pattern="[A-Za-zА-Яа-яЁё]{2,}[ ][A-Za-zА-Яа-яЁё]{2,}"
-            placeholder="Name Surname (min 2 symbols for each)"
-          />
-        </label>
-        <label className={css.label}>
-          <span className={css.labelText}>Number</span>
-          <input
-            className={css.input}
-            name="number"
-            type="text"
-            value={this.state.number}
-            onChange={this.stateChange}
-            pattern="\d{3}[\-]\d{2}[\-]\d{2}"
-            placeholder="111-11-11"
-          />
-        </label>
-        <button className={css.submitBtn} type="submit">
-          Add contact
-        </button>
-      </form>
-    );
-  }
-}
+  return (
+    <form className={css.form} onSubmit={getSubmitData}>
+      <label className={css.label}>
+        <span className={css.labelText}>Name</span>
+        <input
+          className={css.input}
+          name="name"
+          type="text"
+          value={name}
+          onChange={stateChange}
+          pattern="[A-Za-zА-Яа-яЁё]{2,}[ ][A-Za-zА-Яа-яЁё]{2,}"
+          placeholder="Name Surname (min 2 symbols for each)"
+        />
+      </label>
+      <label className={css.label}>
+        <span className={css.labelText}>Number</span>
+        <input
+          className={css.input}
+          name="number"
+          type="text"
+          value={number}
+          onChange={stateChange}
+          pattern="\d{3}[\-]\d{2}[\-]\d{2}"
+          placeholder="111-11-11"
+        />
+      </label>
+      <button className={css.submitBtn} type="submit">
+        Add contact
+      </button>
+    </form>
+  );
+};
 
 export default ContactForm;

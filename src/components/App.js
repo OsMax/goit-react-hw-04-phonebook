@@ -1,48 +1,39 @@
-import { Component } from 'react';
+import { useState, useEffect } from 'react';
 import ContactForm from './ContactForm';
 import Filter from './Filter';
 import ContactList from './ContactList/ContactList';
 import initContacts from './base.json';
 
-class App extends Component {
-  state = {
-    contacts: initContacts,
-    filter: '',
-  };
-  componentDidMount() {
-    const contacts = localStorage.getItem('contacts');
-    if (contacts) {
-      this.setState({ contacts: JSON.parse(contacts) });
-    }
-  }
+function App() {
+  const [contacts, setContacts] = useState(
+    JSON.parse(localStorage.getItem('contacts')) ?? initContacts
+  );
+  const [filter, setFilter] = useState('');
 
-  componentDidUpdate(prevProps, prevState) {
-    if (this.state.contacts !== prevState.contacts) {
-      localStorage.setItem('contacts', JSON.stringify(this.state.contacts));
+  useEffect(() => {
+    localStorage.setItem('contacts', JSON.stringify(contacts));
+    if (!contacts.length) {
+      localStorage.removeItem('contacts');
     }
-  }
+  }, [contacts]);
 
-  onDeleteContact = contactId => {
-    this.setState(prevState => ({
-      contacts: prevState.contacts.filter(contact => contact.id !== contactId),
-    }));
+  const onDeleteContact = contactId => {
+    setContacts(contacts.filter(contact => contact.id !== contactId));
   };
 
-  findContacts = () => {
-    return this.state.contacts.filter(contact =>
-      contact.name
-        .toLocaleLowerCase()
-        .includes(this.state.filter.toLocaleLowerCase())
+  const findContacts = () => {
+    return contacts.filter(contact =>
+      contact.name.toLocaleLowerCase().includes(filter.toLocaleLowerCase())
     );
   };
 
-  setNewFilter = e => {
-    this.setState({ filter: e.target.value });
+  const setNewFilter = e => {
+    setFilter(e.target.value);
   };
 
-  checkNewContat = newContact => {
+  const checkNewContat = newContact => {
     if (
-      this.state.contacts.find(
+      contacts.find(
         contact =>
           contact.name.toLocaleLowerCase() ===
           newContact.name.toLocaleLowerCase()
@@ -50,38 +41,34 @@ class App extends Component {
     ) {
       window.alert(`Contacts name "${newContact.name}" already exists`);
       return false;
-    } else if (
-      this.state.contacts.find(contact => contact.number === newContact.number)
-    ) {
+    } else if (contacts.find(contact => contact.number === newContact.number)) {
       window.alert(`Contacts number "${newContact.number}" already exists`);
       return false;
     }
     return true;
   };
 
-  onSubmitData = newContact => {
-    if (this.checkNewContat(newContact)) {
-      this.setState({ contacts: [...this.state.contacts, newContact] });
+  const onSubmitData = newContact => {
+    if (checkNewContat(newContact)) {
+      setContacts([...contacts, newContact]);
       window.alert(
         `Contacts added: \n Name: ${newContact.name}\n Number: ${newContact.number}\n`
       );
     }
   };
 
-  render() {
-    return (
-      <div className="appContainer">
-        <h1>Phonebook</h1>
-        <ContactForm onSubmitData={this.onSubmitData} />
-        <h2>Contacts</h2>
-        <Filter setNewFilter={this.setNewFilter} />
-        <ContactList
-          contacts={this.findContacts()}
-          onDeleteContact={this.onDeleteContact}
-        />
-      </div>
-    );
-  }
+  return (
+    <div className="appContainer">
+      <h1>Phonebook</h1>
+      <ContactForm onSubmitData={onSubmitData} />
+      <h2>Contacts</h2>
+      <Filter setNewFilter={setNewFilter} />
+      <ContactList
+        contacts={findContacts()}
+        onDeleteContact={onDeleteContact}
+      />
+    </div>
+  );
 }
 
 export default App;
