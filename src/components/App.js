@@ -5,9 +5,9 @@ import ContactList from './ContactList/ContactList';
 import initContacts from './base.json';
 
 function App() {
-  const [contacts, setContacts] = useState(
-    JSON.parse(localStorage.getItem('contacts')) ?? initContacts
-  );
+  const [contacts, setContacts] = useState(() => {
+    return JSON.parse(localStorage.getItem('contacts')) ?? initContacts;
+  });
   const [filter, setFilter] = useState('');
 
   useEffect(() => {
