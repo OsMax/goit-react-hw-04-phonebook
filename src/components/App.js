@@ -32,17 +32,18 @@ function App() {
   };
 
   const checkNewContat = newContact => {
-    if (
-      contacts.find(
-        contact =>
-          contact.name.toLocaleLowerCase() ===
-          newContact.name.toLocaleLowerCase()
-      )
-    ) {
-      window.alert(`Contacts name "${newContact.name}" already exists`);
+    const resName = contacts.find(
+      contact =>
+        contact.name.toLocaleLowerCase() === newContact.name.toLocaleLowerCase()
+    );
+    const resNumber = contacts.find(
+      contact => contact.number === newContact.number
+    );
+    if (resName) {
+      alert(`Contacts name "${newContact.name}" already exists`);
       return false;
-    } else if (contacts.find(contact => contact.number === newContact.number)) {
-      window.alert(`Contacts number "${newContact.number}" already exists`);
+    } else if (resNumber) {
+      alert(`Contacts number "${newContact.number}" already exists`);
       return false;
     }
     return true;
